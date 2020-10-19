@@ -10,12 +10,12 @@ using Foundation.Experiments.Projects.ExperimentMapper.SelectionFactories;
 namespace Foundation.Experiments.Projects.ExperimentMapper.Models
 {
     [ContentType(
-        DisplayName = "Map an experiment to Episerver project(s)",
+        DisplayName = "Project Experiment Mapping",
         Description = "Maps experiment variations to projects which are used as part of the experiment",
         GUID = "7BFD2720-472A-4C23-BD53-E27253EDF204",
         GroupName = "Experiments",
         AvailableInEditMode = true)]
-    [ImageUrl("~/YellowstoneExperiments/Projects-test.png")]
+    [ImageUrl("../Foundation.Experiments/Projects-test.png")]
     public class ProjectExperimentMapping : BlockData
     {
         [Display(Name = "Experiment name",
