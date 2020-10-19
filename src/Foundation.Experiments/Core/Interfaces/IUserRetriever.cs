@@ -1,4 +1,5 @@
-﻿using OptimizelySDK.Entity;
+﻿using System.Web;
+using OptimizelySDK.Entity;
 
 namespace Foundation.Experiments.Core.Interfaces
 {
@@ -11,12 +12,12 @@ namespace Foundation.Experiments.Core.Interfaces
         /// Returns the user Id of the current user if one is found, String.Empty if none found
         /// </summary>
         /// <returns></returns>
-        string GetUserId();
+        string GetUserId(HttpContextBase httpContext);
 
         /// <summary>
         /// Returns attributes of the current user
         /// </summary>
         /// <returns></returns>
-        UserAttributes GetUserAttributes();
+        UserAttributes GetUserAttributes(HttpContextBase httpContext);
     }
 }

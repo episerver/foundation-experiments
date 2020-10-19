@@ -1,4 +1,5 @@
-﻿using EPiServer.Core;
+﻿using System.Web;
+using EPiServer.Core;
 
 namespace Foundation.Experiments.Projects.Interfaces
 {
@@ -11,8 +12,9 @@ namespace Foundation.Experiments.Projects.Interfaces
         /// Gets the project version of the content, otherwise returns the published reference.
         /// </summary>
         /// <param name="publishedContentReference"></param>
+        /// <param name="httpContext"></param>
         /// <returns>A <see cref="ContentReference"/></returns>
-        ContentReference GetProjectVersion(ContentReference publishedContentReference);
+        ContentReference GetProjectVersion(ContentReference publishedContentReference, HttpContextBase httpContext);
 
         ContentReference GetProjectReference(ContentReference publishedReference, int projectId);
 

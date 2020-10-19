@@ -13,10 +13,10 @@ namespace Foundation.Experiments.Rest
 {
     public class ExperimentationClient : IExperimentationClient
     {
-        private readonly ExperimentationConfigOptions _restOptions;
+        private readonly ExperimentationRestApiOptions _restOptions;
         private readonly ILogger _logger;
 
-        public ExperimentationClient(ExperimentationConfigOptions restOptions)
+        public ExperimentationClient(ExperimentationRestApiOptions restOptions)
         {
             _restOptions = restOptions;
 

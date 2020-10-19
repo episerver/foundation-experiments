@@ -19,12 +19,15 @@ namespace Foundation.Experiments.VisitorGroups.FeatureFlag
 
         public override bool IsMatch(IPrincipal principal, HttpContextBase httpContext)
         {
-            if (UserRetriever.Value.GetUserId() != string.Empty)
+            if (ExperimentationFactory.Value.IsConfigured == false)
+                return false;
+
+            if (UserRetriever.Value.GetUserId(httpContext) != string.Empty)
             {
-                var userAttributes = UserRetriever.Value.GetUserAttributes();
+                var userAttributes = UserRetriever.Value.GetUserAttributes(httpContext);
 
                 return ExperimentationFactory.Value.Instance
-                    .IsFeatureEnabled(Model.Feature, UserRetriever.Value.GetUserId(), userAttributes);
+                    .IsFeatureEnabled(Model.Feature, UserRetriever.Value.GetUserId(httpContext), userAttributes);
             }
 
             return false;

@@ -28,7 +28,7 @@ namespace Foundation.Experiments.Projects.Impl
         {
             var filters = _filterProviders.GetFilters(controllerContext, actionDescriptor);
 
-            var projectId = _projectIdResolver.GetProjectId();
+            var projectId = _projectIdResolver.GetProjectId(controllerContext.HttpContext);
             if (projectId == null || projectId.Value == 0)
                 return filters;
 

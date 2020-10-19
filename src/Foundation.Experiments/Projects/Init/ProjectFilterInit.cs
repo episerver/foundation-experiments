@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using EPiServer.Framework;
 using EPiServer.Framework.Initialization;
@@ -33,7 +34,7 @@ namespace Foundation.Experiments.Projects.Init
         private void ContentRoute_RoutedContent(object sender, RoutingEventArgs e)
         {
             var experimentProjectIdentifier = ServiceLocator.Current.GetInstance<IExperimentProjectIdentifier>();
-            var d = experimentProjectIdentifier.GetProjectVersion(e.RoutingSegmentContext.RoutedContentLink);
+            var d = experimentProjectIdentifier.GetProjectVersion(e.RoutingSegmentContext.RoutedContentLink, new HttpContextWrapper(HttpContext.Current));
             e.RoutingSegmentContext.RoutedContentLink = d;
         }
     }

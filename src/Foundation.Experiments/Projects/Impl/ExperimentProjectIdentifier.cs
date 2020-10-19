@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
+using System.Web;
 using EPiServer.Core;
 using EPiServer.DataAbstraction;
 using Foundation.Experiments.Projects.Interfaces;
@@ -11,7 +12,7 @@ namespace Foundation.Experiments.Projects.Impl
     {
         private readonly ProjectRepository _projectRepository;
         private readonly IProjectIdResolver _projectIdResolver;
-        private ObjectCache _cache;
+        private static ObjectCache _cache;
         private static readonly object Padlock = new object();
 
         public ExperimentProjectIdentifier(ProjectRepository projectRepository, IProjectIdResolver projectIdResolver)
@@ -21,9 +22,9 @@ namespace Foundation.Experiments.Projects.Impl
             _cache = new MemoryCache("Experimentation-ProjectListing");
         }
 
-        public ContentReference GetProjectVersion(ContentReference publishedReference)
+        public ContentReference GetProjectVersion(ContentReference publishedReference, HttpContextBase httpContext)
         {
-            var projectId = _projectIdResolver.GetProjectId();
+            var projectId = _projectIdResolver.GetProjectId(httpContext);
             return !projectId.HasValue ? publishedReference : GetProjectReference(publishedReference, projectId.Value);
         }
 

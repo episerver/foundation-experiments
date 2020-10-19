@@ -1,8 +1,10 @@
-﻿namespace Foundation.Experiments.Projects.Interfaces
+﻿using System.Web;
+
+namespace Foundation.Experiments.Projects.Interfaces
 {
     public interface IProjectIdResolver
     {
-        int? GetProjectId();
-        bool ShouldContinue();
+        int? GetProjectId(HttpContextBase httpContext);
+        bool ShouldContinue(HttpContextBase httpContext);
     }
 }

@@ -19,15 +19,18 @@ namespace Foundation.Experiments.VisitorGroups.FeatureVariable
 
         public override bool IsMatch(IPrincipal principal, HttpContextBase httpContext)
         {
-            if (UserRetriever.Value.GetUserId() != string.Empty)
+            if (ExperimentationFactory.Value.IsConfigured == false)
+                return false;
+
+            if (UserRetriever.Value.GetUserId(httpContext) != string.Empty)
             {
                 if (ExperimentationFactory.Value.Instance
-                    .IsFeatureEnabled(Model.Feature, UserRetriever.Value.GetUserId()))
+                    .IsFeatureEnabled(Model.Feature, UserRetriever.Value.GetUserId(httpContext)))
                 {
                     var allVars = ExperimentationFactory.Value.Instance
                         .GetAllFeatureVariables(Model.Feature,
-                            UserRetriever.Value.GetUserId(),
-                            UserRetriever.Value.GetUserAttributes());
+                            UserRetriever.Value.GetUserId(httpContext),
+                            UserRetriever.Value.GetUserAttributes(httpContext));
                     foreach (var variable in allVars.ToDictionary())
                     {
                         if (variable.Key == Model.Variable)

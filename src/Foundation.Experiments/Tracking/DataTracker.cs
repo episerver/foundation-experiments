@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using EPiServer;
 using EPiServer.Core;
 using EPiServer.Logging;
@@ -27,8 +28,8 @@ namespace Foundation.Experiments.Tracking
                 return;
 
             var userRetriever = ServiceLocator.Current.GetInstance<IUserRetriever>();
-            var userId = userRetriever.GetUserId();
-            var userAttributes = userRetriever.GetUserAttributes();
+            var userId = userRetriever.GetUserId(new HttpContextWrapper(HttpContext.Current));
+            var userAttributes = userRetriever.GetUserAttributes(new HttpContextWrapper(HttpContext.Current));
 
             EventTags eventTags;
             if (trackingData.EventType == DefaultKeys.EventBasket)
@@ -180,7 +181,10 @@ namespace Foundation.Experiments.Tracking
         {
             try
             {
-                ExperimentationFactory.Value.Instance?.Track(type, userId, userAttributes, eventTags);
+                if (ExperimentationFactory.Value.IsConfigured)
+                {
+                    ExperimentationFactory.Value.Instance?.Track(type, userId, userAttributes, eventTags);
+                }
                 return true;
             }
             catch (Exception e)

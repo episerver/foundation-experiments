@@ -15,37 +15,36 @@ namespace Foundation.Experiments.Projects.Impl
     {
         private readonly IExperimentationFactory _experimentationFactory;
         private readonly IUserRetriever _userRetriever;
-        private readonly Lazy<HttpContextBase> _httpContextBase;
         private readonly Lazy<IContentRepository> _contentRepo;
         private readonly IPublishedStateAssessor _publishedStateAssessor;
 
         public DefaultProjectIdResolver(IUserRetriever userRetriever, 
             IExperimentationFactory experimentationFactory,
-            Lazy<HttpContextBase> httpContextBase, Lazy<IContentRepository> contentRepo, 
+            Lazy<IContentRepository> contentRepo, 
             IPublishedStateAssessor publishedStateAssessor)
         {
             _userRetriever = userRetriever;
             _experimentationFactory = experimentationFactory;
-            _httpContextBase = httpContextBase;
             _contentRepo = contentRepo;
             _publishedStateAssessor = publishedStateAssessor;
         }
 
-        public int? GetProjectId()
+        public int? GetProjectId(HttpContextBase httpContext)
         {
             try
             {
-                if (ShouldContinue() == false) 
+                if (ShouldContinue(httpContext) == false) 
+                    return null;
+
+                if (_experimentationFactory.IsConfigured == false)
                     return null;
 
                 var instance = _experimentationFactory.Instance;
-                if (instance == null)
-                    return null;
 
-                //if (_httpContextBase?.Value.Items["ProjectId"] != null)
-                //{
-                //    return int.Parse(_httpContextBase.Value.Items["ProjectId"].ToString());
-                //}
+                if (httpContext?.Items["ProjectId"] != null)
+                {
+                    return int.Parse(httpContext.Items["ProjectId"].ToString());
+                }
 
                 var experimentMap = GetProjectExperimentMapping();
                 if (experimentMap == null)
@@ -53,11 +52,11 @@ namespace Foundation.Experiments.Projects.Impl
 
                 var experimentKey = experimentMap.ExperimentKey;
 
-                var userId = _userRetriever.GetUserId();
+                var userId = _userRetriever.GetUserId(httpContext);
                 if (userId == string.Empty)
                     return 0;
 
-                var userAttributes = _userRetriever.GetUserAttributes();
+                var userAttributes = _userRetriever.GetUserAttributes(httpContext);
 
                 var projectVariation = instance.Activate(experimentKey, userId, userAttributes);
                 if (projectVariation != null)
@@ -70,10 +69,10 @@ namespace Foundation.Experiments.Projects.Impl
                         {
                             if (projectId > 0)
                             {
-                                //if (_httpContextBase != null)
-                                //{
-                                //    _httpContextBase.Value.Items["ProjectId"] = projectId;
-                                //}
+                                if (httpContext != null)
+                                {
+                                    httpContext.Items["ProjectId"] = projectId;
+                                }
 
                                 return projectId;
                             }
@@ -91,12 +90,12 @@ namespace Foundation.Experiments.Projects.Impl
             return null;
         }
 
-        public bool ShouldContinue()
+        public bool ShouldContinue(HttpContextBase httpContext)
         {
             if (RequestSegmentContext.CurrentContextMode == ContextMode.Default)
             {
-                if (_httpContextBase != null && _httpContextBase.Value.Request.Url != null &&
-                    !_httpContextBase.Value.Request.Url.AbsolutePath.ToLower().StartsWith("/episerver"))
+                if (httpContext != null && httpContext.Request.Url != null &&
+                    !httpContext.Request.Url.AbsolutePath.ToLower().StartsWith("/episerver"))
                 {
                     return true;
                 }

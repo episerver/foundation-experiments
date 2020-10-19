@@ -15,10 +15,6 @@ namespace Foundation.Experiments.Core.Impl
 
         private static Optimizely GetInstance()
         {
-            var options = ServiceLocator.Current.GetInstance<ExperimentationOptions>();
-            if (string.IsNullOrEmpty(options.SdkKey))
-                return null;
-
             try
             {
                 var errorLogger = ServiceLocator.Current.GetInstance<OptimizelySDK.Logger.ILogger>();
@@ -43,5 +39,13 @@ namespace Foundation.Experiments.Core.Impl
         }
 
         public Optimizely Instance => OptimizelyInstance.Value;
+
+        public bool IsConfigured {
+            get
+            {
+                var options = ServiceLocator.Current.GetInstance<ExperimentationOptions>();
+                return !string.IsNullOrEmpty(options.SdkKey);
+            }
+        }
     }
 }

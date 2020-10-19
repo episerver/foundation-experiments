@@ -3,7 +3,7 @@
 namespace Foundation.Experiments.Core.Config
 {
     [Options]
-    public class ExperimentationConfigOptions
+    public class ExperimentationRestApiOptions
     {
         private string _restAuthToken;
         public string ProjectId { get; set; }

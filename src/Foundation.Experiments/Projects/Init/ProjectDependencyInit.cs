@@ -12,9 +12,14 @@ namespace Foundation.Experiments.Projects.Init
     {
         public void ConfigureContainer(ServiceConfigurationContext context)
         {
-            var services = context.Services;
+            context.ConfigurationComplete += Context_ConfigurationComplete;
+        }
+
+        private void Context_ConfigurationComplete(object sender, ServiceConfigurationEventArgs e)
+        {
+            var services = e.Services;
             services.AddTransient<IProjectIdResolver, DefaultProjectIdResolver>();
-            services.AddSingleton<IExperimentProjectIdentifier, ExperimentProjectIdentifier>();
+            services.AddTransient<IExperimentProjectIdentifier, ExperimentProjectIdentifier>();
         }
 
         public void Initialize(InitializationEngine context) { }

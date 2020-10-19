@@ -15,18 +15,23 @@ namespace Foundation.Experiments.Core.Init
     {
         public void ConfigureContainer(ServiceConfigurationContext context)
         {
-            var services = context.Services;
-            services.AddTransient<IUserRetriever, DefaultUserRetriever>();
-            services.AddSingleton<IExperimentationFactory, DefaultExperimentationFactory>();
-            services.AddSingleton<IExperimentationClient, ExperimentationClient>();
-            services.AddSingleton<ILogger, DefaultExperimentationErrorLogger>();
-            services.AddSingleton(x => GetProjectConfigManager());
+            context.ConfigurationComplete += Context_ConfigurationComplete;
         }
 
-        public ExperimentationProjectConfigManager GetProjectConfigManager()
+        private void Context_ConfigurationComplete(object sender, ServiceConfigurationEventArgs e)
         {
-            var options = ServiceLocator.Current.GetInstance<ExperimentationOptions>();
-            var errorLogger = ServiceLocator.Current.GetInstance<ILogger>();
+            var services = e.Services;
+            services.AddTransient<IUserRetriever, DefaultUserRetriever>();
+            services.AddTransient<IExperimentationFactory, DefaultExperimentationFactory>();
+            services.AddSingleton<IExperimentationClient, ExperimentationClient>();
+            services.AddTransient<ILogger, DefaultExperimentationErrorLogger>();
+            services.AddSingleton(x => GetProjectConfigManager(x));
+        }
+
+        public ExperimentationProjectConfigManager GetProjectConfigManager(IServiceLocator s)
+        {
+            var options = s.GetInstance<ExperimentationOptions>();
+            var errorLogger = s.GetInstance<ILogger>();
 
             var projectConfigManager =
                 new ExperimentationProjectConfigManager.Builder()

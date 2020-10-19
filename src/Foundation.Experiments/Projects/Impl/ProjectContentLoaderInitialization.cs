@@ -73,7 +73,7 @@ namespace Foundation.Experiments.Projects.Impl
             if (!ShouldContinue(e.Content))
                 return;
 
-            var projectId = _projectIdResolver.Value.GetProjectId();
+            var projectId = _projectIdResolver.Value.GetProjectId(new HttpContextWrapper(HttpContext.Current));
             if (!projectId.HasValue || projectId.Value == 0)
             {
                 return;
