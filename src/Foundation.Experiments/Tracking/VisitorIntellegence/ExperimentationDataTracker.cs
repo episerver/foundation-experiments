@@ -11,7 +11,7 @@ using Foundation.Experiments.Rest;
 using Newtonsoft.Json;
 using OptimizelySDK.Entity;
 
-namespace Foundation.Experiments.Tracking
+namespace Foundation.Experiments.Tracking.VisitorIntellegence
 {
     [ServiceConfiguration(ServiceType = typeof(ITrackingDataInterceptor), Lifecycle = ServiceInstanceScope.Singleton)]
     public class ExperimentationDataTracker : ITrackingDataInterceptor
