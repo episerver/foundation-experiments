@@ -43,6 +43,11 @@ namespace Foundation.Experiments.Core.Impl
 
         public virtual UserAttributes GetUserAttributes(HttpContextBase httpContext)
         {
+            return GetUserAttributes(httpContext, true);
+        }
+
+        public UserAttributes GetUserAttributes(HttpContextBase httpContext, bool IncludeVisitorGroups)
+        {
             lock (_padlock)
             {
                 if (httpContext.Items.Contains("ExperimentationUserData"))
@@ -51,11 +56,22 @@ namespace Foundation.Experiments.Core.Impl
                     return attributes;
                 }
 
-                var userAttributes = new UserAttributes
+                var userAttributes = new UserAttributes();
+                if (IncludeVisitorGroups)
                 {
-                    {DefaultKeys.VisitorGroup, string.Join(",", GetUserVisitorGroups(httpContext))},
-                    {DefaultKeys.UserRoles, string.Join(",", GetUserRoles(httpContext))}
-                };
+                    userAttributes = new UserAttributes
+                    {
+                        {DefaultKeys.VisitorGroup, string.Join(",", GetUserVisitorGroups(httpContext))},
+                        {DefaultKeys.UserRoles, string.Join(",", GetUserRoles(httpContext))}
+                    };
+                }
+                else
+                {
+                    userAttributes = new UserAttributes
+                    {
+                        {DefaultKeys.UserRoles, string.Join(",", GetUserRoles(httpContext))}
+                    };
+                }
 
                 if (httpContext?.User?.Identity != null)
                     userAttributes.Add(DefaultKeys.UserLoggedIn, httpContext.User.Identity.IsAuthenticated);

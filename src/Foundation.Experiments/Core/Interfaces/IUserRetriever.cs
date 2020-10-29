@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System.Collections;
+using System.Web;
 using OptimizelySDK.Entity;
 
 namespace Foundation.Experiments.Core.Interfaces
@@ -19,5 +20,11 @@ namespace Foundation.Experiments.Core.Interfaces
         /// </summary>
         /// <returns></returns>
         UserAttributes GetUserAttributes(HttpContextBase httpContext);
+
+        /// <summary>
+        /// Returns attributes of the current user
+        /// </summary>
+        /// <returns></returns>
+        UserAttributes GetUserAttributes(HttpContextBase httpContext, bool IncludeVisitorGroups);
     }
 }
