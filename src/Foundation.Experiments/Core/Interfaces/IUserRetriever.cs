@@ -25,6 +25,6 @@ namespace Foundation.Experiments.Core.Interfaces
         /// Returns attributes of the current user
         /// </summary>
         /// <returns></returns>
-        UserAttributes GetUserAttributes(HttpContextBase httpContext, bool IncludeVisitorGroups);
+        UserAttributes GetUserAttributes(HttpContextBase httpContext, bool includeVisitorGroups);
     }
 }

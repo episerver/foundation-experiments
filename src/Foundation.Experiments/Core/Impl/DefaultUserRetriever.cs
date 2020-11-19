@@ -15,6 +15,7 @@ namespace Foundation.Experiments.Core.Impl
         private readonly Lazy<IVisitorGroupRepository> _visitorGroupRepository;
         private readonly Lazy<IVisitorGroupRoleRepository> _visitorGroupRoleRepository;
         private readonly object _padlock = new object();
+        private readonly object _vgPadlock = new object();
 
         public DefaultUserRetriever(
             Lazy<UIRoleProvider> roleProvider,
@@ -46,18 +47,18 @@ namespace Foundation.Experiments.Core.Impl
             return GetUserAttributes(httpContext, true);
         }
 
-        public UserAttributes GetUserAttributes(HttpContextBase httpContext, bool IncludeVisitorGroups)
+        public UserAttributes GetUserAttributes(HttpContextBase httpContext, bool includeVisitorGroups)
         {
             lock (_padlock)
             {
-                if (httpContext.Items.Contains("ExperimentationUserData"))
+                if (httpContext.Items.Contains("ExperimentationUserData-" + includeVisitorGroups.ToString()))
                 {
-                    var attributes = httpContext.Items["ExperimentationUserData"] as UserAttributes;
+                    var attributes = httpContext.Items["ExperimentationUserData-" + includeVisitorGroups.ToString()] as UserAttributes;
                     return attributes;
                 }
 
                 var userAttributes = new UserAttributes();
-                if (IncludeVisitorGroups)
+                if (includeVisitorGroups)
                 {
                     userAttributes = new UserAttributes
                     {
@@ -78,26 +79,35 @@ namespace Foundation.Experiments.Core.Impl
                 else
                     userAttributes.Add(DefaultKeys.UserLoggedIn, false);
 
-                httpContext.Items.Add("ExperimentationUserData", userAttributes);
+                httpContext.Items.Add("ExperimentationUserData-" + includeVisitorGroups.ToString(), userAttributes);
                 return userAttributes;
             }
         }
 
         public virtual List<string> GetUserVisitorGroups(HttpContextBase httpContext)
         {
-            var visitorGroupId = new List<string>();
-            var user = httpContext.User;
-            var visitorGroups = _visitorGroupRepository.Value.List();
-            foreach (var visitorGroup in visitorGroups)
+            lock (_vgPadlock)
             {
-                if (_visitorGroupRoleRepository.Value.TryGetRole(visitorGroup.Name, out var virtualRoleObject))
+                if (httpContext.Items.Contains("Experimentation-VisitorGroups"))
                 {
-                    if (virtualRoleObject.IsMatch(user, httpContext))
-                        visitorGroupId.Add(visitorGroup.Name);
+                    var attributes = httpContext.Items["Experimentation-VisitorGroups"] as List<string>;
+                    return attributes;
                 }
-            }
 
-            return visitorGroupId;
+                var visitorGroupId = new List<string>();
+                var user = httpContext.User;
+                var visitorGroups = _visitorGroupRepository.Value.List();
+                foreach (var visitorGroup in visitorGroups)
+                {
+                    if (_visitorGroupRoleRepository.Value.TryGetRole(visitorGroup.Name, out var virtualRoleObject))
+                    {
+                        if (virtualRoleObject.IsMatch(user, httpContext))
+                            visitorGroupId.Add(visitorGroup.Name);
+                    }
+                }
+
+                return visitorGroupId;
+            }
         }
 
         public virtual List<string> GetUserRoles(HttpContextBase httpContext)
