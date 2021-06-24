@@ -1,0 +1,35 @@
+﻿.fullstack-flag {
+    background: url('../Images/FeatureFlag.png');
+    height: 16px;
+    width: 16px;
+}
+.fullstack-audience {
+    background: url('../Images/Audience.png');
+    height: 16px;
+    width: 16px;
+}
+.fullstack-event {
+    background: url('../Images/Event.png');
+    height: 16px;
+    width: 16px;
+}
+.fullstack-folder {
+    background: url('../Images/fullstack-logo.png');
+    background-size: 16px 16px;
+    height: 16px;
+    width: 16px;
+}
+
+.fullstack-feature {
+    background: url('../Images/feature.png');
+    background-size: 16px 16px;
+    height: 16px;
+    width: 16px;
+}
+
+.fullstack-experiment {
+    background: url('../Images/experiment.png');
+    background-size: 16px 16px;
+    height: 16px;
+    width: 16px;
+}
