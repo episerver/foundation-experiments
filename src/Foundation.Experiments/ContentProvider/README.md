@@ -6,12 +6,12 @@ Optimizely Fullstack ContentProvider provides and easy way to bring in Optimizel
 
 1. Web.config Application Settings
    ```sh
-    <add key="optimizely:full-stack:projectId" value="20296260335" />
-    <add key="optimizely:full-stack:token" value="2:n9aekv2qnbbCG6ZEV8iYYyiwE8pS20R_tZRMYutd3JZ8y8OIvYZg" />
-    <add key="optimizely:full-stack:APIVersion" value="v2" />
-    <add key="optimizely:full-stack:Environment" value="development" />
-    <add key="optimizely:full-stack:sdkkey" value="MKDwmNvmtcjWPzFMHYUoS" />
-    <add key="optimizely:full-stack:cacheinminutes" value="10" />
+    <add key="episerver:setoption:Optimizely.DeveloperFullStack.Core.ProjectId,Optimizely.DeveloperFullStack" value="ProjectID" />
+    <add key="episerver:setoption:Optimizely.DeveloperFullStack.Core.RestAuthToken,Optimizely.DeveloperFullStack" value="AUTHTOKEN" />
+    <add key="episerver:setoption:Optimizely.DeveloperFullStack.Core.APIVersion,Optimizely.DeveloperFullStack" value="v2" />
+    <add key="episerver:setoption:Optimizely.DeveloperFullStack.Core.EnviromentKey,Optimizely.DeveloperFullStack" value="development" />
+    <add key="episerver:setoption:Optimizely.DeveloperFullStack.Core.SDKKey,Optimizely.DeveloperFullStack" value="SDKKEY" />
+    <add key="episerver:setoption:Optimizely.DeveloperFullStack.Core.CacheInMinutes,Optimizely.DeveloperFullStack" value="10" />
    ```
 2. Rebuild the project.  You might have to clear your personalized view to view the new content provider in the assets tab. 
     1.  Go into edit mode and click on your user icon in the upper right hand corner of the screen.
