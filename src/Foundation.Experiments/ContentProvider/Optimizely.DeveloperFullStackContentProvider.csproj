@@ -206,6 +206,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\FullStackContentLoader.cs" />
+    <Compile Include="Core\FullStackSettingsOptions.cs" />
     <Compile Include="Core\IFullStackContentLoader.cs" />
     <Compile Include="Initialization\ConfigurationModule.cs" />
     <Compile Include="EditorDescriptors\ExperimentUIDescriptor.cs" />
@@ -237,7 +238,6 @@
     <Compile Include="Models\VariationData.cs" />
     <Compile Include="OptimizelyFullStackContentProvider.cs" />
     <Compile Include="OptimizelyFullStackSearchProvider.cs" />
-    <Compile Include="OptimizelyFullStackSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\IOptimizelyFullStackRepository.cs" />
     <Compile Include="REST\Models\Audiences\Audience.cs" />

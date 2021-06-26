@@ -33,12 +33,15 @@ namespace Optimizely.DeveloperFullStack
 
         private ContentFactory _contentFactory;
 
+        private readonly FullStackSettingsOptions _fullStackSettingsOptions;
+
         public OptimizelyFullStackContentProvider(
             IOptimizelyFullStackRepository optimizelyFullStackAPI,
             IdentityMappingService identityMappingService,
             ContentFactory contentFactory,
             IContentTypeRepository contentTypeRepository,
-            IContentLoader contentLoader)
+            IContentLoader contentLoader,
+            FullStackSettingsOptions _fullStackSettingsOptions)
         {
             _identityMappingService = identityMappingService;
             _contentLoader = contentLoader;
@@ -101,10 +104,6 @@ namespace Optimizely.DeveloperFullStack
                     if (flagVariable?.VariableDefinitions?.Definitions?.Keys?.Contains(fullStackResourceId.Key) == true)
                         currentContent = CreateVariableDefinition(mappedIdentity, flagVariable.VariableDefinitions.Definitions[fullStackResourceId.Key]);
                     break;
-
-                case FullStackType.Experiment:
-
-                    break;
             }
             return currentContent;
         }
@@ -115,9 +114,9 @@ namespace Optimizely.DeveloperFullStack
             var childrenList = new List<GetChildrenReferenceResult>();
             if (contentLink.CompareToIgnoreWorkID(EntryPoint))
             {
-                childrenList.Add(new GetChildrenReferenceResult() { ContentLink = _identityMappingService.Get(MappedIdentity.ConstructExternalIdentifier(ProviderKey, new FullStackResourceId(OptimizelyFullStackSettings.ProjectId.ToString(), FullStackType.AudienceFolder, ((int)FullStackType.AudienceFolder).ToString()).ToString()), true).ContentLink, IsLeafNode = false, ModelType = typeof(AudienceFolderData) });
-                childrenList.Add(new GetChildrenReferenceResult() { ContentLink = _identityMappingService.Get(MappedIdentity.ConstructExternalIdentifier(ProviderKey, new FullStackResourceId(OptimizelyFullStackSettings.ProjectId.ToString(), FullStackType.EventFolder, ((int)FullStackType.EventFolder).ToString()).ToString()), true).ContentLink, IsLeafNode = false, ModelType = typeof(EventFolderData) });
-                childrenList.Add(new GetChildrenReferenceResult() { ContentLink = _identityMappingService.Get(MappedIdentity.ConstructExternalIdentifier(ProviderKey, new FullStackResourceId(OptimizelyFullStackSettings.ProjectId.ToString(), FullStackType.FlagFolder, ((int)FullStackType.FlagFolder).ToString()).ToString()), true).ContentLink, IsLeafNode = false, ModelType = typeof(FlagFolderData) });
+                childrenList.Add(new GetChildrenReferenceResult() { ContentLink = _identityMappingService.Get(MappedIdentity.ConstructExternalIdentifier(ProviderKey, new FullStackResourceId(_fullStackSettingsOptions.ProjectId.ToString(), FullStackType.AudienceFolder, ((int)FullStackType.AudienceFolder).ToString()).ToString()), true).ContentLink, IsLeafNode = false, ModelType = typeof(AudienceFolderData) });
+                childrenList.Add(new GetChildrenReferenceResult() { ContentLink = _identityMappingService.Get(MappedIdentity.ConstructExternalIdentifier(ProviderKey, new FullStackResourceId(_fullStackSettingsOptions.ProjectId.ToString(), FullStackType.EventFolder, ((int)FullStackType.EventFolder).ToString()).ToString()), true).ContentLink, IsLeafNode = false, ModelType = typeof(EventFolderData) });
+                childrenList.Add(new GetChildrenReferenceResult() { ContentLink = _identityMappingService.Get(MappedIdentity.ConstructExternalIdentifier(ProviderKey, new FullStackResourceId(_fullStackSettingsOptions.ProjectId.ToString(), FullStackType.FlagFolder, ((int)FullStackType.FlagFolder).ToString()).ToString()), true).ContentLink, IsLeafNode = false, ModelType = typeof(FlagFolderData) });
 
                 return childrenList;
             }
@@ -172,7 +171,7 @@ namespace Optimizely.DeveloperFullStack
                         {
                             foreach (var definition in flag.VariableDefinitions.Definitions)
                             {
-                                var definitionResourceId = new FullStackResourceId(OptimizelyFullStackSettings.ProjectId, FullStackType.VariableDefinition, fullStackResourceId.Id, definition.Key);
+                                var definitionResourceId = new FullStackResourceId(_fullStackSettingsOptions.ProjectId, FullStackType.VariableDefinition, fullStackResourceId.Id, definition.Key);
                                 var definitionMappedIdentity = _identityMappingService.Get(MappedIdentity.ConstructExternalIdentifier(ProviderKey, definitionResourceId.ToString()), true);
 
                                 childrenList.Add(new GetChildrenReferenceResult()
@@ -186,12 +185,12 @@ namespace Optimizely.DeveloperFullStack
                         }
 
                         // Load in Experiments
-                        if (flag.Enviroments.Environments.ContainsKey(OptimizelyFullStackSettings.EnviromentKey))
+                        if (flag.Enviroments.Environments.ContainsKey(_fullStackSettingsOptions.EnviromentKey))
                         {
-                            var environment = flag.Enviroments.Environments[OptimizelyFullStackSettings.EnviromentKey];
+                            var environment = flag.Enviroments.Environments[_fullStackSettingsOptions.EnviromentKey];
                             if (environment.Rules.Any())
                             {
-                                var experimentResourceId = new FullStackResourceId(OptimizelyFullStackSettings.ProjectId, FullStackType.Experiment, fullStackResourceId.Id, environment.Key);
+                                var experimentResourceId = new FullStackResourceId(_fullStackSettingsOptions.ProjectId, FullStackType.Experiment, fullStackResourceId.Id, environment.Key);
                                 var enviromentMappedIdentity = _identityMappingService.Get(MappedIdentity.ConstructExternalIdentifier(ProviderKey, experimentResourceId.ToString()), true);
                                 childrenList.Add(new GetChildrenReferenceResult()
                                 {
@@ -208,7 +207,7 @@ namespace Optimizely.DeveloperFullStack
                         {
                             foreach (var variant in variants.Items)
                             {
-                                var variantResourceId = new FullStackResourceId(OptimizelyFullStackSettings.ProjectId, FullStackType.Variation, fullStackResourceId.Id, variant.Key);
+                                var variantResourceId = new FullStackResourceId(_fullStackSettingsOptions.ProjectId, FullStackType.Variation, fullStackResourceId.Id, variant.Key);
                                 var variantMappedIdentity = _identityMappingService.Get(MappedIdentity.ConstructExternalIdentifier(ProviderKey, variantResourceId.ToString()), true);
                                 childrenList.Add(new GetChildrenReferenceResult()
                                 {
@@ -232,10 +231,7 @@ namespace Optimizely.DeveloperFullStack
             var list = new List<IContent>();
 
             if (contentReferences.Any())
-            {
-                foreach (var contentLink in contentReferences)
-                    list.Add(Load(contentLink, selector));
-            }
+                list.AddRange(contentReferences.Select(reference => Load(reference, selector)));
 
             return list;
         }
@@ -257,6 +253,7 @@ namespace Optimizely.DeveloperFullStack
         {
             if (ContentReference.IsNullOrEmpty(contentLink))
                 return null;
+
             if (!contentLink.ProviderName.Equals(FullStackConstants.RepositoryKey, StringComparison.OrdinalIgnoreCase))
                 return null;
 
@@ -333,7 +330,7 @@ namespace Optimizely.DeveloperFullStack
 
         private FlagData CreateFlag(MappedIdentity mappedIdentity, Flag item)
         {
-            var parentIdentity = MappedIdentity.ConstructExternalIdentifier(ProviderKey, new FullStackResourceId(OptimizelyFullStackSettings.ProjectId, FullStackType.FlagFolder, ((int)FullStackType.FlagFolder).ToString()).ToString());
+            var parentIdentity = MappedIdentity.ConstructExternalIdentifier(ProviderKey, new FullStackResourceId(_fullStackSettingsOptions.ProjectId, FullStackType.FlagFolder, ((int)FullStackType.FlagFolder).ToString()).ToString());
             var content = CreateBasicContentData<FlagData>(mappedIdentity, _identityMappingService.Get(parentIdentity, true).ContentLink, item.Name) as FlagData;
             FillData(content, item);
             content.Urn = item.Urn;
@@ -364,7 +361,7 @@ namespace Optimizely.DeveloperFullStack
             content.Flag = item.FlagKey;
             content.Enabled = item.Enabled;
             content.InUse = item.InUse;
-            content.ProjectId = OptimizelyFullStackSettings.ProjectId;
+            content.ProjectId = _fullStackSettingsOptions.ProjectId;
             content.FullStackId = item.Id.ToString();
 
             if (content is IContentSecurable securable)
@@ -475,7 +472,7 @@ namespace Optimizely.DeveloperFullStack
         protected override void SetCacheSettings(IContent content, CacheSettings cacheSettings)
         {
             cacheSettings.SlidingExpiration = System.Web.Caching.Cache.NoSlidingExpiration;
-            cacheSettings.AbsoluteExpiration = DateTime.Now.AddMinutes(OptimizelyFullStackSettings.CacheInMinutes);
+            cacheSettings.AbsoluteExpiration = DateTime.Now.AddMinutes(_fullStackSettingsOptions.CacheInMinutes);
 
             base.SetCacheSettings(content, cacheSettings);
         }
@@ -483,7 +480,7 @@ namespace Optimizely.DeveloperFullStack
         protected override void SetCacheSettings(ContentReference contentReference, IEnumerable<GetChildrenReferenceResult> children, CacheSettings cacheSettings)
         {
             cacheSettings.SlidingExpiration = System.Web.Caching.Cache.NoSlidingExpiration;
-            cacheSettings.AbsoluteExpiration = DateTime.Now.AddMinutes(OptimizelyFullStackSettings.CacheInMinutes);
+            cacheSettings.AbsoluteExpiration = DateTime.Now.AddMinutes(_fullStackSettingsOptions.CacheInMinutes);
 
             base.SetCacheSettings(contentReference, children, cacheSettings);
         }

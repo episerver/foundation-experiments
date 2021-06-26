@@ -19,11 +19,13 @@ namespace Optimizely.DeveloperFullStack.Core
     {
         private readonly IRestClient _restClient;
 
-        public OptimizelyFullStackRepository()
+        private readonly FullStackSettingsOptions _fullStackSettingsOptions;
+
+        public OptimizelyFullStackRepository(FullStackSettingsOptions fullStackSettingsOptions)
         {
             _restClient = new RestClient(FullStackConstants.APIBaseUrl);
             _restClient.UseSerializer(() => new JsonNetSerializer());
-            _restClient.AddDefaultHeader("Authorization", OptimizelyFullStackSettings.RestAuthToken);
+            _restClient.AddDefaultHeader("Authorization", _fullStackSettingsOptions.RestAuthToken);
         }
 
         #region Projects
@@ -31,7 +33,7 @@ namespace Optimizely.DeveloperFullStack.Core
         public List<Project> GetProjects()
         {
             var request = new RestRequest("/{apiVersion}/projects", Method.GET)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion);
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion);
             var environments = _restClient.Get<List<Project>>(request);
             return environments.Data;
         }
@@ -39,7 +41,7 @@ namespace Optimizely.DeveloperFullStack.Core
         public Project GetProject(string id)
         {
             var request = new RestRequest("/{apiVersion}/projects/{id}", Method.GET)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
                 .AddUrlSegment("id", id);
             var environment = _restClient.Get<Project>(request);
             return environment.Data;
@@ -52,8 +54,8 @@ namespace Optimizely.DeveloperFullStack.Core
         public List<Environment> GetEnvironments()
         {
             var request = new RestRequest("/{apiVersion}/environments", Method.GET)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
-                .AddQueryParameter("project_id", OptimizelyFullStackSettings.ProjectId);
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
+                .AddQueryParameter("project_id", _fullStackSettingsOptions.ProjectId);
             var environments = _restClient.Get<List<Environment>>(request);
             return environments.Data;
         }
@@ -61,7 +63,7 @@ namespace Optimizely.DeveloperFullStack.Core
         public Environment GetEnvironment(string id)
         {
             var request = new RestRequest("/{apiVersion}/environments/{id}", Method.GET)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
                 .AddUrlSegment("id", id);
             var environment = _restClient.Get<Environment>(request);
             return environment.Data;
@@ -74,8 +76,8 @@ namespace Optimizely.DeveloperFullStack.Core
         public List<Experiment> GetExperiments()
         {
             var request = new RestRequest("/{apiVersion}/experiments", Method.GET)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
-                .AddQueryParameter("project_id", OptimizelyFullStackSettings.ProjectId);
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
+                .AddQueryParameter("project_id", _fullStackSettingsOptions.ProjectId);
             var experiments = _restClient.Get<List<Experiment>>(request);
             foreach (var experiment in experiments.Data)
             {
@@ -87,7 +89,7 @@ namespace Optimizely.DeveloperFullStack.Core
         public Experiment GetExperiment(string id)
         {
             var request = new RestRequest("/{apiVersion}/experiments/{id}", Method.GET)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
                 .AddUrlSegment("id", id);
             var experiments = _restClient.Get<Experiment>(request);
             return experiments.Data;
@@ -115,8 +117,8 @@ namespace Optimizely.DeveloperFullStack.Core
         public List<Event> GetEvents()
         {
             var request = new RestRequest("/{apiVersion}/events", Method.GET)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
-                .AddQueryParameter("project_id", OptimizelyFullStackSettings.ProjectId);
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
+                .AddQueryParameter("project_id", _fullStackSettingsOptions.ProjectId);
             var events = _restClient.Get<List<Event>>(request);
             return events.Data;
         }
@@ -124,7 +126,7 @@ namespace Optimizely.DeveloperFullStack.Core
         public Event GetEvent(string id)
         {
             var request = new RestRequest("/{apiVersion}/events/{event_id}", Method.GET)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
                 .AddUrlSegment("event_id", id);
             var events = _restClient.Get<Event>(request);
             return events.Data;
@@ -137,8 +139,8 @@ namespace Optimizely.DeveloperFullStack.Core
         public List<Audience> GetAudiences()
         {
             var request = new RestRequest("/{apiVersion}/audiences", Method.GET)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
-                .AddQueryParameter("project_id", OptimizelyFullStackSettings.ProjectId);
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
+                .AddQueryParameter("project_id", _fullStackSettingsOptions.ProjectId);
             var audiences = _restClient.Get<List<Audience>>(request);
             return audiences.Data;
         }
@@ -146,7 +148,7 @@ namespace Optimizely.DeveloperFullStack.Core
         public Audience GetAudience(string id)
         {
             var request = new RestRequest("/{apiVersion}/audiences/{audience_id}", Method.GET)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
                 .AddUrlSegment("audience_id", id);
             var audience = _restClient.Get<Audience>(request);
             return audience.Data;
@@ -154,9 +156,9 @@ namespace Optimizely.DeveloperFullStack.Core
 
         public Audience SaveAudience(SaveAudienceRequest saveAudienceRequest)
         {
-            saveAudienceRequest.ProjectId = long.Parse(OptimizelyFullStackSettings.ProjectId);
+            saveAudienceRequest.ProjectId = long.Parse(_fullStackSettingsOptions.ProjectId);
             var request = new RestRequest("/{apiVersion}/audiences", Method.POST)
-                   .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
+                   .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
                    .AddJsonBody(saveAudienceRequest);
 
             var audience = _restClient.Post<Audience>(request);
@@ -173,7 +175,7 @@ namespace Optimizely.DeveloperFullStack.Core
         public Attribute GetAttribute(string id)
         {
             var request = new RestRequest("/{apiVersion}/attributes/{attribute_id}", Method.GET)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
                 .AddUrlSegment("attribute_id", id);
 
             var attributes = _restClient.Get<Attribute>(request);
@@ -186,8 +188,8 @@ namespace Optimizely.DeveloperFullStack.Core
         public List<Attribute> GetAttributes(int perPage = 20, int page = 1)
         {
             var request = new RestRequest("/{apiVersion}/attributes", Method.GET)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
-                .AddQueryParameter("project_id", OptimizelyFullStackSettings.ProjectId)
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
+                .AddQueryParameter("project_id", _fullStackSettingsOptions.ProjectId)
                 .AddQueryParameter("per_page", perPage.ToString())
                 .AddQueryParameter("project_id", page.ToString());
 
@@ -200,9 +202,9 @@ namespace Optimizely.DeveloperFullStack.Core
 
         public Attribute SaveAttribute(SaveAttributeRequest attributeRequest)
         {
-            attributeRequest.ProjectId = long.Parse(OptimizelyFullStackSettings.ProjectId);
+            attributeRequest.ProjectId = long.Parse(_fullStackSettingsOptions.ProjectId);
             var request = new RestRequest("/{apiVersion}/attributes", Method.POST)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
                 .AddJsonBody(attributeRequest);
 
             var attribute = _restClient.Post<Attribute>(request);
@@ -219,8 +221,8 @@ namespace Optimizely.DeveloperFullStack.Core
         public List<Feature> GetFeatures()
         {
             var request = new RestRequest("/{apiVersion}/features", Method.GET)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
-                .AddQueryParameter("project_id", OptimizelyFullStackSettings.ProjectId);
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
+                .AddQueryParameter("project_id", _fullStackSettingsOptions.ProjectId);
             var features = _restClient.Get<List<Feature>>(request);
             return features.Data;
         }
@@ -228,7 +230,7 @@ namespace Optimizely.DeveloperFullStack.Core
         public Feature GetFeature(string id)
         {
             var request = new RestRequest("/{apiVersion}/features/{feature_id}", Method.GET)
-                .AddUrlSegment("apiVersion", OptimizelyFullStackSettings.APIVersion)
+                .AddUrlSegment("apiVersion", _fullStackSettingsOptions.APIVersion)
                 .AddUrlSegment("feature_id", id);
             var feature = _restClient.Get<Feature>(request);
             return feature.Data;
@@ -241,7 +243,7 @@ namespace Optimizely.DeveloperFullStack.Core
         public FlagList GetFlags(int perPage = 20)
         {
             var request = new RestRequest("/flags/v1/projects/{project_id}/flags", Method.GET)
-                .AddUrlSegment("project_id", OptimizelyFullStackSettings.ProjectId)
+                .AddUrlSegment("project_id", _fullStackSettingsOptions.ProjectId)
                 .AddQueryParameter("per_page", perPage.ToString());
             var features = _restClient.Get<FlagList>(request);
             return features.Data;
@@ -250,7 +252,7 @@ namespace Optimizely.DeveloperFullStack.Core
         public Flag GetFlag(string flagKey)
         {
             var request = new RestRequest("/flags/v1/projects/{project_id}/flags/{flag_key}", Method.GET)
-                .AddUrlSegment("project_id", OptimizelyFullStackSettings.ProjectId)
+                .AddUrlSegment("project_id", _fullStackSettingsOptions.ProjectId)
                 .AddUrlSegment("flag_key", flagKey);
             var feature = _restClient.Get<Flag>(request);
             return feature.Data;
@@ -263,7 +265,7 @@ namespace Optimizely.DeveloperFullStack.Core
         public VariationList GetVariations(string flagKey, int perPage = 20)
         {
             var request = new RestRequest("/flags/v1/projects/{project_id}/flags/{flag_key}/variations", Method.GET)
-                .AddUrlSegment("project_id", OptimizelyFullStackSettings.ProjectId)
+                .AddUrlSegment("project_id", _fullStackSettingsOptions.ProjectId)
                 .AddUrlSegment("flag_key", flagKey)
                 .AddQueryParameter("per_page", perPage.ToString());
             var features = _restClient.Get<VariationList>(request);
@@ -273,7 +275,7 @@ namespace Optimizely.DeveloperFullStack.Core
         public VariationItem GetVariation(string flagKey, string variationKey)
         {
             var request = new RestRequest("/flags/v1/projects/{project_id}/flags/{flag_key}/variations/{variation_key}", Method.GET)
-                .AddUrlSegment("project_id", OptimizelyFullStackSettings.ProjectId)
+                .AddUrlSegment("project_id", _fullStackSettingsOptions.ProjectId)
                 .AddUrlSegment("flag_key", flagKey)
                 .AddUrlSegment("variation_key", variationKey);
             var feature = _restClient.Get<VariationItem>(request);
