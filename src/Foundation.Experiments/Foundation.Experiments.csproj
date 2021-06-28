@@ -9,6 +9,11 @@
     <WarningsAsErrors />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="ContentProvider\**" />
+    <EmbeddedResource Remove="ContentProvider\**" />
+    <None Remove="ContentProvider\**" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="EPiServer.CMS.UI.Core" Version="11.1.0" />
     <PackageReference Include="EPiServer.Tracking.Core" Version="1.19.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
