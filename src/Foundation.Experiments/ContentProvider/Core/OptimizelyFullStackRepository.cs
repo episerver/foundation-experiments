@@ -26,6 +26,7 @@ namespace Optimizely.DeveloperFullStack.Core
             _restClient = new RestClient(FullStackConstants.APIBaseUrl);
             _restClient.UseSerializer(() => new JsonNetSerializer());
             _restClient.AddDefaultHeader("Authorization", _fullStackSettingsOptions.RestAuthToken);
+            _fullStackSettingsOptions = fullStackSettingsOptions;
         }
 
         #region Projects

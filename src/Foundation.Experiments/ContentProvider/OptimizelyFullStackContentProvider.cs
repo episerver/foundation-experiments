@@ -41,13 +41,14 @@ namespace Optimizely.DeveloperFullStack
             ContentFactory contentFactory,
             IContentTypeRepository contentTypeRepository,
             IContentLoader contentLoader,
-            FullStackSettingsOptions _fullStackSettingsOptions)
+            FullStackSettingsOptions fullStackSettingsOptions)
         {
             _identityMappingService = identityMappingService;
             _contentLoader = contentLoader;
             _contentFactory = contentFactory;
             _contentTypeRepository = contentTypeRepository;
             _optimizelyFullStackRepository = optimizelyFullStackAPI;
+            _fullStackSettingsOptions = fullStackSettingsOptions;
         }
 
         protected override IContent LoadContent(ContentReference contentLink, ILanguageSelector languageSelector)
