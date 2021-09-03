@@ -4,7 +4,8 @@ namespace Foundation.Experiments.Core.Interfaces
 {
     public interface IExperimentationFactory
     {
-        Optimizely Instance { get; }
+        OptimizelySDK.Optimizely Instance { get; }
+
         bool IsConfigured { get; }
     }
 }
